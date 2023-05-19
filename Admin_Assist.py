@@ -26,6 +26,7 @@ def sfAccount_selector(_config):
         sfAccount = st.sidebar.text_input("Enter Account")
     sfUser = st.sidebar.text_input("Enter Username")
     sfPass = st.sidebar.text_input("Enter Password",type='password')
+    st.sidebar.write('Press Enter to Login')
     if sfUser and sfPass:
         conn = {"account": sfAccount,
                 "user": sfUser,
@@ -52,7 +53,6 @@ def get_user_list(_session):
     user_list_df = _session.sql("SELECT *,datediff('day',last_success_login,current_timestamp()) as last_success_login_days FROM snowflake.account_usage.USERS WHERE DELETED_ON IS NULL;").collect()
     pd_user_list_df = pd.DataFrame(user_list_df)
     return pd_user_list_df
-
 
 def get_actionable_user_list(session,selected_action,pd_user_list_df):
     if selected_action == 'Enable User':
