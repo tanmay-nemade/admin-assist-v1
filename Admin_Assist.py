@@ -36,7 +36,7 @@ def sfAccount_selector(_config):
             return session
 
 #Function to Create a session using the connection parameters
-@st.cache_resource
+
 def session_builder(conn):
     session = Session.builder.configs(conn).create()
     return session
@@ -47,13 +47,13 @@ st.set_page_config(
 )
 
 st.title('Admin Assist V1')
-@st.cache_data
+
 def get_user_list(_session):
     user_list_df = _session.sql("SELECT *,datediff('day',last_success_login,current_timestamp()) as last_success_login_days FROM snowflake.account_usage.USERS WHERE DELETED_ON IS NULL;").collect()
     pd_user_list_df = pd.DataFrame(user_list_df)
     return pd_user_list_df
 
-@st.cache_data
+
 def get_actionable_user_list(session,selected_action,pd_user_list_df):
     if selected_action == 'Enable User':
         action_user_list = pd_user_list_df[pd_user_list_df['DISABLED'] == 'true']
@@ -69,7 +69,7 @@ def get_actionable_user_list(session,selected_action,pd_user_list_df):
         return pd_user_list_df
     #'Enable User','Disable User','Drop User'
 
-@st.cache_data
+
 def search_user(session,pd_user_list_df):
     #selected_name = pd_user_list_df1[pd_user_list_df1['DISPLAY_NAME'] == selected_user]
     selected_criteria = st.sidebar.selectbox("Select relevant search criteria",['Display Name','Name','Email'])
@@ -93,19 +93,19 @@ def search_user(session,pd_user_list_df):
     #str1 = selected_name['ALLOWED_VALUES'][index1[0]][1:-1]
     st.write(selected_id)
 
-@st.cache_data
+
 def disable_user(session,name,selected_user):
     #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[ALTER USER ",name," SET DISABLED = TRUE;]**")
     if st.button("Do you wish to continue ?"):
         st.write("**:blue[User ",selected_user," disabled successfully !]**")
-@st.cache_data
+
 def enable_user(session,name,selected_user):
     #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[ALTER USER ",name," SET DISABLED = FALSE;]**")
     if st.button("Do you wish to continue ?"):
         st.write("**:blue[User ",selected_user," enabled successfully !]**")
-@st.cache_data
+
 def drop_user(session,name,selected_user):
     #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[DROP USER ",name,";]**")
@@ -113,19 +113,17 @@ def drop_user(session,name,selected_user):
         st.write("**:blue[User ",selected_user," successfully dropped !]**")
 
 #Define a function to get list of all programs and also cache this data for multiple time consumption
-@st.cache_data
 def get_program_list(session):
     program_list = session.sql("select distinct tag_value from snowflake.account_usage.tag_references where domain = 'DATABASE' and tag_name = 'PROGRAM' order by tag_value;").collect()
     program_list = [list(row.asDict().values())[0] for row in program_list]
     return program_list
 
-@st.cache_data
 def get_project_list(session):
     project_list = session.sql("select distinct tag_value as projects from snowflake.account_usage.tag_references where tag_name = 'PROJECT' and domain = 'WAREHOUSE' and object_deleted is null and substr(tag_value,1,3) = 'PRJ' order by projects;").collect()
     project_list = [list(row.asDict().values())[0] for row in project_list]
     return project_list
 
-@st.cache_data
+
 def assign_role(session,selected_name,selected_user):
     program_list = get_program_list(session)
     project_list = get_project_list(session)
@@ -157,7 +155,6 @@ def assign_role(session,selected_name,selected_user):
         st.button("Do you wish to continue ?")
     
 
-@st.cache_data
 def get_off_size_files(_session):
     file_list_df = _session.sql("SELECT PROGRAM,\
                                     TABLE_CATALOG || '.' || TABLE_SCHEMA || '.' || T.TABLE_NAME as TableName,\
