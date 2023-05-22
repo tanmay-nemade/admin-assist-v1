@@ -46,7 +46,7 @@ st.set_page_config(
 )
 
 st.title('Admin Assist Login')
-st.info('Login on this screen to use other tools seemlessly')
+st.info('Login on this screen to use other tools seemlessly. Please refresh the page after every login attempt or while switching between accounts')
 
 try:
     session = sfAccount_selector(config)
@@ -54,7 +54,7 @@ try:
     if session:
         st.success('Connection Successful')    
 except snowflake.connector.errors.DatabaseError:
-    st.error('Connection Unsuccessful. Please check your personal account id, username or password and refresh the page')
+    st.error('Connection Unsuccessful. Incorect personal account id, username or password or expired personal account. Please refresh the page')
     st.info('Note: 3 unsucessful attempts to login temporarily locks the account. In this case, try to login after 15 minutes')
 except snowflake.connector.errors.OperationalError:
     st.error('Connection Unsuccessful. Please turn off Zscaler and refresh the page')
