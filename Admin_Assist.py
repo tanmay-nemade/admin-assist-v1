@@ -46,7 +46,7 @@ st.set_page_config(
 )
 
 st.title('Admin Assist Login')
-st.info('Login on this screen to use other tools seemlessly. Please refresh the page after every login attempt or while switching between accounts')
+st.info('Login on this screen to use other tools seemlessly. Please refresh the page while switching between accounts')
 
 try:
     session = sfAccount_selector(config)
