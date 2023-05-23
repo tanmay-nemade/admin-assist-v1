@@ -22,17 +22,17 @@ def sfAccount_selector(_config):
         sfAccount = _config['Accounts']['Infosys']
     else:
         sfAccount = st.text_input("Enter Account")
+    st.session_state['sfAccount'] = sfAccount
     sfUser = st.text_input("Enter Username")
+    st.session_state['sfUser'] = sfUser    
     sfPass = st.text_input("Enter Password",type='password')
-    st.write('Press Enter to Login')
+    st.session_state['sfPass'] = sfPass
     if sfUser and sfPass:
         conn = {"account": sfAccount,
                 "user": sfUser,
                 "password": sfPass}
         if conn is not None:
-    # if st.sidebar.button('Connect'):
-            session = session_builder(conn)
-            return session
+            return conn
 
 #Function to Create a session using the connection parameters
 
@@ -48,16 +48,18 @@ st.set_page_config(
 st.title('Admin Assist Login')
 st.info('Login on this screen to use other tools seemlessly. Please refresh the page while switching between accounts')
 
-try:
-    session = sfAccount_selector(config)
-    st.session_state['Session'] = session
-    if session:
-        st.success('Connection Successful')    
-except snowflake.connector.errors.DatabaseError:
-    st.error('Connection Unsuccessful. Incorect personal account id, username or password or expired personal account. Please refresh the page')
-    st.info('Note: 3 unsucessful attempts to login temporarily locks the account. In this case, try to login after 15 minutes')
-except snowflake.connector.errors.OperationalError:
-    st.error('Connection Unsuccessful. Please turn off Zscaler and refresh the page')
-except:
-    st.error('Connection Unsuccessful. Please refresh the page and try again with correct details')
+conn = sfAccount_selector(config)
+if st.button('Connect'):
+    try:
+        session = session_builder(conn)
+        st.session_state['Session'] = session
+        if session:
+            st.success('Connection Successful')    
+    except snowflake.connector.errors.DatabaseError:
+        st.error('Connection Unsuccessful. Incorect personal account id, username or password or expired personal account. Please refresh the page')
+        st.info('Note: 3 unsucessful attempts to login temporarily locks the account. In this case, try to login after 15 minutes')
+    except snowflake.connector.errors.OperationalError:
+        st.error('Connection Unsuccessful. Please turn off Zscaler and refresh the page')
+    except:
+        st.error('Connection Unsuccessful. Please refresh the page and try again with correct details')
 

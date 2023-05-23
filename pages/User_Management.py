@@ -25,7 +25,7 @@ def get_actionable_user_list(session,selected_action,pd_user_list_df):
 def search_user(session,pd_user_list_df):
     #selected_name = pd_user_list_df1[pd_user_list_df1['DISPLAY_NAME'] == selected_user]
     selected_criteria = st.sidebar.selectbox("Select relevant search criteria",['Display Name','Name','Email'])
-    selected_value = st.sidebar.text_input("Enter serach keyword")
+    selected_value = st.sidebar.text_input("Enter search keyword")
     if selected_criteria == 'Display Name':
         st.write("You selected Display Name and selected value is ",selected_value)
         #selected_name = pd_user_list_df['DISPLAY_NAME'].str.contains(selected_value, na=False)
@@ -33,7 +33,7 @@ def search_user(session,pd_user_list_df):
         st.write(selected_name)
     if selected_criteria == 'Name':
         st.write("You selected Name and selected value is ",selected_value)
-        selected_name = pd_user_list_df[pd_user_list_df['NAME'].str.contains(selected_value, na=False)]
+        selected_name = pd_user_list_df[pd_user_list_df['NAME'].str.contains(selected_value, na=False, case = False)]
         st.write(selected_name)
     if selected_criteria == 'Email':
         st.write("You selected Email and selected value is ",selected_value)
