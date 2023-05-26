@@ -47,21 +47,21 @@ def search_user(session,pd_user_list_df):
 
 
 def disable_user(session,name,selected_user):
-    #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[ALTER USER ",name," SET DISABLED = TRUE;]**")
     if st.button("Do you wish to continue ?"):
+        # session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name)).collect()
         st.write("**:blue[User ",selected_user," disabled successfully !]**")
 
 def enable_user(session,name,selected_user):
-    #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[ALTER USER ",name," SET DISABLED = FALSE;]**")
     if st.button("Do you wish to continue ?"):
+        # session.sql("ALTER USER {} SET DISABLED = FALSE;".format(name)).collect()
         st.write("**:blue[User ",selected_user," enabled successfully !]**")
 
 def drop_user(session,name,selected_user):
-    #session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name))
     st.write("**:blue[DROP USER ",name,";]**")
     if st.button("Do you wish to continue ?"):
+        # session.sql("DROP USER {};".format(name)).collect()
         st.write("**:blue[User ",selected_user," successfully dropped !]**")
 
 #Define a function to get list of all programs and also cache this data for multiple time consumption
@@ -114,7 +114,7 @@ pd_user_list_df1 = pd_user_list_df[['DISPLAY_NAME','NAME','EMAIL','DISABLED']]
 selected_action = st.sidebar.radio("Select User Management Option",['Search User','Enable User','Disable User','Drop User','Assign Role','Revoke Role'])
 action_user_list = get_actionable_user_list(session,selected_action,pd_user_list_df)
 if selected_action != 'Search User':
-    selected_user = st.sidebar.selectbox("Select user for specified action",action_user_list)
+    selected_user = st.selectbox("Select user for specified action",action_user_list)
     selected_name = pd_user_list_df1[pd_user_list_df1['DISPLAY_NAME'] == selected_user]
     selected_name = selected_name.iloc[-1]['NAME']
     with st.spinner("Wait a minute"):
