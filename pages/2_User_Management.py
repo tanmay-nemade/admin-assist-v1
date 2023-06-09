@@ -113,7 +113,6 @@ def assign_role(session,selected_name,selected_user):
         st.write("**:blue[GRANT ROLE ",selected_role," TO USER ",selected_name,";]**")
         st.button("Do you wish to continue ?")
 
-@st.cache_resource(experimental_allow_widgets=True)
 def role_selection(_session):
     role_df = _session.sql('show roles;').collect()
     role_df = pd.DataFrame(role_df)
@@ -123,7 +122,6 @@ def role_selection(_session):
         set_role = _session.sql(f'''USE ROLE {role_select} ;''').collect()
         return set_role
 
-@st.cache_resource(experimental_allow_widgets=True)
 def warehouse_selection(_session):
     warehouse_df = _session.sql('show warehouses;').collect()
     warehouse_df = pd.DataFrame(warehouse_df)
