@@ -2,6 +2,13 @@ import streamlit as st
 import pandas as pd
 from snowflake.snowpark.functions import *
 
+st.set_page_config(
+    layout="wide",
+    page_title="Over/Under Size File Identifier"
+)
+
+st.title('Over/Under Size File Indentifier')
+
 def get_off_size_files(_session):
     file_list_df = _session.sql("SELECT PROGRAM,\
                                     TABLE_CATALOG || '.' || TABLE_SCHEMA || '.' || T.TABLE_NAME as TableName,\
@@ -19,9 +26,13 @@ def get_off_size_files(_session):
     pd_file_list_df = pd.DataFrame(file_list_df)
     st.dataframe(pd_file_list_df)
 
-session = st.session_state['Session']
+try:
+    session = st.session_state['Session']
+    with st.spinner("Wait a minute"):
+        get_off_size_files(session)
+    st.success('Done!')
 
-with st.spinner("Wait a minute"):
-    st.header('**:blue[Over / Under Size Identifier]**')
-    get_off_size_files(session)
-st.success('Done!')
+except KeyError:
+     st.info('Please Login first using correct credentials')
+except snowflake.snowpark.exceptions.SnowparkSessionException:
+    st.info('You have Logged Out. Please Login Again')

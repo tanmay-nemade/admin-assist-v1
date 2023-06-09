@@ -2,6 +2,13 @@ import streamlit as st
 import pandas as pd
 from snowflake.snowpark.functions import *
 
+st.set_page_config(
+    layout="wide",
+    page_title="User Management"
+)
+
+st.title('User Management')
+
 def get_user_list(_session):
     user_list_df = _session.sql("SELECT *,datediff('day',last_success_login,current_timestamp()) as last_success_login_days FROM snowflake.account_usage.USERS WHERE DELETED_ON IS NULL;").collect()
     pd_user_list_df = pd.DataFrame(user_list_df)
@@ -106,26 +113,55 @@ def assign_role(session,selected_name,selected_user):
         st.write("**:blue[GRANT ROLE ",selected_role," TO USER ",selected_name,";]**")
         st.button("Do you wish to continue ?")
 
-session = st.session_state['Session']
+@st.cache_resource(experimental_allow_widgets=True)
+def role_selection(_session):
+    role_df = _session.sql('show roles;').collect()
+    role_df = pd.DataFrame(role_df)
+    role_list = role_df['name']
+    role_select = st.sidebar.selectbox('Select a Role', role_list)
+    if st.sidebar.button('Use Role'):
+        set_role = _session.sql(f'''USE ROLE {role_select} ;''').collect()
+        return set_role
 
-pd_user_list_df = get_user_list(session)
-pd_user_list_df = pd_user_list_df[['DISPLAY_NAME','NAME','LOGIN_NAME','EMAIL','DISABLED','LAST_SUCCESS_LOGIN_DAYS']]
-pd_user_list_df1 = pd_user_list_df[['DISPLAY_NAME','NAME','EMAIL','DISABLED']]
-selected_action = st.sidebar.radio("Select User Management Option",['Search User','Enable User','Disable User','Drop User','Assign Role','Revoke Role'])
-action_user_list = get_actionable_user_list(session,selected_action,pd_user_list_df)
-if selected_action != 'Search User':
-    selected_user = st.selectbox("Select user for specified action",action_user_list)
-    selected_name = pd_user_list_df1[pd_user_list_df1['DISPLAY_NAME'] == selected_user]
-    selected_name = selected_name.iloc[-1]['NAME']
-    with st.spinner("Wait a minute"):
-        if selected_action == 'Disable User':
-            disable_user(session,selected_name,selected_user)
-        if selected_action == 'Enable User':
-            enable_user(session,selected_name,selected_user)
-        if selected_action == 'Drop User':
-            drop_user(session,selected_name,selected_user)
-        if selected_action == 'Assign Role':
-            assign_role(session,selected_name,selected_user)
-else:
-    search_user(session,pd_user_list_df)
-st.success('Done!')
+@st.cache_resource(experimental_allow_widgets=True)
+def warehouse_selection(_session):
+    warehouse_df = _session.sql('show warehouses;').collect()
+    warehouse_df = pd.DataFrame(warehouse_df)
+    warehouse_list = warehouse_df['name']
+    warehouse_select = st.sidebar.selectbox('Select a Role', warehouse_list)
+    if st.sidebar.button('Use Warehouse'):
+        set_warehouse = _session.sql(f'''USE WAREHOUSE {warehouse_select} ;''').collect()
+
+try:
+    session = st.session_state['Session']
+    set_role = role_selection(session)
+    if set_role != '':
+        warehouse_selection(session)
+
+    pd_user_list_df = get_user_list(session)
+    pd_user_list_df = pd_user_list_df[['DISPLAY_NAME','NAME','LOGIN_NAME','EMAIL','DISABLED','LAST_SUCCESS_LOGIN_DAYS']]
+    pd_user_list_df1 = pd_user_list_df[['DISPLAY_NAME','NAME','EMAIL','DISABLED']]
+    selected_action = st.sidebar.radio("Select User Management Option",['Search User','Enable User','Disable User','Drop User','Assign Role','Revoke Role'])
+    action_user_list = get_actionable_user_list(session,selected_action,pd_user_list_df)
+    if selected_action != 'Search User':
+        selected_user = st.selectbox("Select user for specified action",action_user_list)
+        selected_name = pd_user_list_df1[pd_user_list_df1['DISPLAY_NAME'] == selected_user]
+        selected_name = selected_name.iloc[-1]['NAME']
+        with st.spinner("Wait a minute"):
+            if selected_action == 'Disable User':
+                disable_user(session,selected_name,selected_user)
+            if selected_action == 'Enable User':
+                enable_user(session,selected_name,selected_user)
+            if selected_action == 'Drop User':
+                drop_user(session,selected_name,selected_user)
+            if selected_action == 'Assign Role':
+                assign_role(session,selected_name,selected_user)
+    else:
+        search_user(session,pd_user_list_df)
+    st.success('Done!')
+
+except KeyError:
+     st.info('Please Login first using correct credentials')
+
+except snowflake.snowpark.exceptions.SnowparkSessionException:
+    st.info('You have Logged Out. Please Login Again')

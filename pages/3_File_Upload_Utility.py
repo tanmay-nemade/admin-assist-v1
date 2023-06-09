@@ -66,6 +66,7 @@ def data_selector():
         table_select = st.selectbox('Choose table',(tables))
         return session, db_select, sc_select, table_select
     
+    
 # Step 12 Create a radio input with the schemas_list() function
 try:
     session,db_select,sc_select,table_select = data_selector()
@@ -83,7 +84,7 @@ try:
                 'password': st.session_state['sfPass'],
                 'schema': sc_select,
                 'database': db_select,
-            } 
+            }
         Mode = st.radio("Select mode",('Overwrite','Append'))
         if st.button('Upload'):
             session = Session.builder.configs(conn2).create()
@@ -101,6 +102,10 @@ try:
         st.table(data)
 except TypeError:
     st.write('Schema has no tables. Choose a different schema or a different database')
+except KeyError:
+     st.info('Please Login first using correct credentials')
+except snowflake.snowpark.exceptions.SnowparkSessionException:
+    st.info('You have Logged Out. Please Login Again')
 
 
     
