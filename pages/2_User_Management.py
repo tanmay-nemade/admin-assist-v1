@@ -125,6 +125,7 @@ def role_selection(_session):
 def warehouse_selection(_session):
     warehouse_df = _session.sql('show warehouses;').collect()
     warehouse_df = pd.DataFrame(warehouse_df)
+    warehouse_df
     warehouse_list = warehouse_df['name']
     warehouse_select = st.sidebar.selectbox('Select a Role', warehouse_list)
     if st.sidebar.button('Use Warehouse'):
@@ -135,6 +136,11 @@ try:
     set_role = role_selection(session)
     if set_role != '':
         warehouse_selection(session)
+    
+    current_role = session.sql('select current_role();').collect()
+    current_role
+    current_warehouse = session.sql('select current_warehouse();').collect()
+    current_warehouse
 
     pd_user_list_df = get_user_list(session)
     pd_user_list_df = pd_user_list_df[['DISPLAY_NAME','NAME','LOGIN_NAME','EMAIL','DISABLED','LAST_SUCCESS_LOGIN_DAYS']]
@@ -158,8 +164,8 @@ try:
         search_user(session,pd_user_list_df)
     st.success('Done!')
 
-except KeyError:
-     st.info('Please Login first using correct credentials')
+# except KeyError:
+#      st.info('Please Login first using correct credentials')
 
 except snowflake.snowpark.exceptions.SnowparkSessionException:
     st.info('You have Logged Out. Please Login Again')
