@@ -15,6 +15,7 @@ try:
             if st.button('Log Out'):
                 session.close()
                 st.error('Logged Out Successfully')
-except KeyError:
-     st.info('Please Login first using correct credentials')
+except KeyError as e:
+    if e.args[0] == '''st.session_state has no key "Session". Did you forget to initialize it? More info: https://docs.streamlit.io/library/advanced-features/session-state#initialization''':
+        st.info('Please Login first using correct credentials')
      

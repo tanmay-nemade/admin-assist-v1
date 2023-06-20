@@ -32,7 +32,10 @@ try:
         get_off_size_files(session)
     st.success('Done!')
 
-except KeyError:
-     st.info('Please Login first using correct credentials')
-except snowflake.snowpark.exceptions.SnowparkSessionException:
-    st.info('You have Logged Out. Please Login Again')
+except KeyError as e:
+    if e.args[0] == '''st.session_state has no key "Session". Did you forget to initialize it? More info: https://docs.streamlit.io/library/advanced-features/session-state#initialization''':
+        st.info('Please Login first using correct credentials')
+
+except snowflake.snowpark.exceptions.SnowparkSessionException as e:
+    if e.args[0] == 'Cannot perform this operation because the session has been closed.':
+       st.info('You have Logged Out. Please Login Again')
