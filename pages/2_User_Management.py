@@ -132,6 +132,10 @@ def warehouse_selection(_session):
         set_warehouse = _session.sql(f'''USE WAREHOUSE {warehouse_select} ;''').collect()
 
 try:
+    current_role = session.sql('select current_role();').collect()
+    st.write('Your current role is'+str(current_role))
+    current_warehouse = session.sql('select current_warehouse();').collect()
+    st.write('Your current warehouse is'+str(current_warehouse))
     session = st.session_state['Session']
     set_role = role_selection(session)
     if set_role != '':
