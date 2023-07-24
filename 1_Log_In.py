@@ -36,6 +36,23 @@ def sfAccount_selector(_config):
             return conn
 
 #Function to Create a session using the connection parameters
+def switch_page(page_name: str):
+    from streamlit.runtime.scriptrunner import RerunData, RerunException
+    from streamlit.source_util import get_pages
+    def standardize_name(name: str) -> str:
+        return name.lower().replace("_", " ")
+    page_name = standardize_name(page_name)
+    pages = get_pages("2_help_page.py")  # OR whatever your main page is called
+    for page_hash, config in pages.items():
+        if standardize_name(config["page_name"]) == page_name:
+            raise RerunException(
+                RerunData(
+                    page_script_hash=page_hash,
+                    page_name=page_name,
+                )
+            )
+    page_names = [standardize_name(config["page_name"]) for config in pages.values()]
+    raise ValueError(f"Could not find page {page_name}. Must be one of {page_names}")
 
 def session_builder(conn):
     session = Session.builder.configs(conn).create()
@@ -55,7 +72,8 @@ if connect:
         session = session_builder(conn)
         st.session_state['Session'] = session
         if session:
-            st.success('Connection Successful')   
+            st.success('Connection Successful')
+            switch_page("Help_page")  
     except snowflake.connector.errors.DatabaseError as e:
         if 'Your free trial has ended and all of your virtual warehouses have been suspended. Add billing information in the Snowflake web UI to continue using the full set of Snowflake features.' in e.args[0]:
             st.write('Your Free Trial has expired. Use a different account')
