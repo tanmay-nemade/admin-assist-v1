@@ -132,11 +132,15 @@ def warehouse_selection(_session):
         set_warehouse = _session.sql(f'''USE WAREHOUSE {warehouse_select} ;''').collect()
 
 try:
-    current_role = session.sql('select current_role();').collect()
-    st.write('Your current role is'+str(current_role))
-    current_warehouse = session.sql('select current_warehouse();').collect()
-    st.write('Your current warehouse is'+str(current_warehouse))
     session = st.session_state['Session']
+    current_role = session.sql('select current_role();').collect()
+    current_role = pd.DataFrame(current_role)
+    current_role = current_role.iloc[0]['CURRENT_ROLE()']
+    st.write('Your current role is '+str(current_role))
+    current_warehouse = session.sql('select current_warehouse();').collect()
+    current_warehouse = pd.DataFrame(current_warehouse)
+    current_warehouse = current_warehouse.iloc[0]['CURRENT_WAREHOUSE()']
+    st.write('Your current warehouse is '+str(current_warehouse))
     set_role = role_selection(session)
     if set_role != '':
         warehouse_selection(session)

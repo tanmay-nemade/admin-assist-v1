@@ -58,18 +58,26 @@ def file_to_upload(chosen_db, chosen_schema, chosen_table):
 def data_selector():
     session = st.session_state['Session']
     database = db_list(session)
+    current_role = session.sql('select current_role();').collect()
+    current_role = pd.DataFrame(current_role)
+    current_role = current_role.iloc[0]['CURRENT_ROLE()']
+    st.write('Your current role is '+str(current_role))
+    current_warehouse = session.sql('select current_warehouse();').collect()
+    current_warehouse = pd.DataFrame(current_warehouse)
+    current_warehouse = current_warehouse.iloc[0]['CURRENT_WAREHOUSE()']
+    st.write('Your current warehouse is '+str(current_warehouse))
     db_select = st.selectbox('Choose Database',(database))
     schemas = schemas_list(db_select, session)
     sc_select = st.selectbox('Choose Schema',(schemas))
     tables = tables_list(db_select, sc_select, session)
     if list(tables) != []:
         table_select = st.selectbox('Choose table',(tables))
-        return session, db_select, sc_select, table_select
+        return db_select, sc_select, table_select
     
     
 # Step 12 Create a radio input with the schemas_list() function
 try:
-    session,db_select,sc_select,table_select = data_selector()
+    session, db_select,sc_select,table_select = data_selector()
     file_type = st.selectbox('Choose a file type you want to upload',('Excel','CSV'))
     chosen_file = st.file_uploader(label=file_to_upload(db_select,sc_select,table_select))
     if chosen_file is not None:

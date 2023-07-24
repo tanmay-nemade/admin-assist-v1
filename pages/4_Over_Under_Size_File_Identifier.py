@@ -28,6 +28,14 @@ def get_off_size_files(_session):
 
 try:
     session = st.session_state['Session']
+    current_role = session.sql('select current_role();').collect()
+    current_role = pd.DataFrame(current_role)
+    current_role = current_role.iloc[0]['CURRENT_ROLE()']
+    st.write('Your current role is '+str(current_role))
+    current_warehouse = session.sql('select current_warehouse();').collect()
+    current_warehouse = pd.DataFrame(current_warehouse)
+    current_warehouse = current_warehouse.iloc[0]['CURRENT_WAREHOUSE()']
+    st.write('Your current warehouse is '+str(current_warehouse))
     with st.spinner("Wait a minute"):
         get_off_size_files(session)
     st.success('Done!')
