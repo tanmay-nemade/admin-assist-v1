@@ -56,19 +56,19 @@ def search_user(session,pd_user_list_df):
 def disable_user(session,name,selected_user):
     st.write("**:blue[ALTER USER ",name," SET DISABLED = TRUE;]**")
     if st.button("Do you wish to continue ?"):
-        # session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name)).collect()
+        session.sql("ALTER USER {} SET DISABLED = TRUE;".format(name)).collect()
         st.write("**:blue[User ",selected_user," disabled successfully !]**")
 
 def enable_user(session,name,selected_user):
     st.write("**:blue[ALTER USER ",name," SET DISABLED = FALSE;]**")
     if st.button("Do you wish to continue ?"):
-        # session.sql("ALTER USER {} SET DISABLED = FALSE;".format(name)).collect()
+        session.sql("ALTER USER {} SET DISABLED = FALSE;".format(name)).collect()
         st.write("**:blue[User ",selected_user," enabled successfully !]**")
 
 def drop_user(session,name,selected_user):
     st.write("**:blue[DROP USER ",name,";]**")
     if st.button("Do you wish to continue ?"):
-        # session.sql("DROP USER {};".format(name)).collect()
+        session.sql("DROP USER {};".format(name)).collect()
         st.write("**:blue[User ",selected_user," successfully dropped !]**")
 
 #Define a function to get list of all programs and also cache this data for multiple time consumption
